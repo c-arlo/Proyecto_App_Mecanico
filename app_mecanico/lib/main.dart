@@ -50,7 +50,11 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 150,
             ),
             TextField(
-
+              controller: usuarioContr,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Usuario',
+              ),
             ),
           ],
         ),
