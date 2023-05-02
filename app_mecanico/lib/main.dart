@@ -1,3 +1,4 @@
+import 'package:app_mecanico/vistas/Vlistreport.dart';
 import 'package:app_mecanico/vistas/Vreguser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -127,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         onPressed: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
-                            return const Vreguser();
+                            return const Vlistreport();
                           }));
                         },
                         child: const Text('Iniciar Sesión'),
