@@ -3,11 +3,23 @@ import 'package:app_mecanico/vistas/Vreguser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:app_mecanico/reporte/Reporte.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await Hive.initFlutter();
+  await Hive.openBox('Clientes');
+  await Hive.openBox('usuarios');
+  await Hive.openBox('Citas');
+  Hive.registerAdapter<Cliente>(ClienteAdapter());
+  Hive.registerAdapter<Reporte>(ReporteAdapter());
+  Hive.registerAdapter<Carro>(CarroAdapter());
+  await Hive.openBox<Cliente>('clientes2');
+
   runApp(const MyApp());
+  SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
 }
 
 class MyApp extends StatelessWidget {
@@ -32,16 +44,19 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController nombreCtrl = TextEditingController();
-  final TextEditingController contraCtrl = TextEditingController();
+var box = Hive.box('usuarios');
 
+class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController userCtrl = TextEditingController();
+  final TextEditingController contraCtrl = TextEditingController();
+  
   void _estado() {
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+  bool error = true;
     return Scaffold(
       backgroundColor: Color(0xFF1C488D),
       appBar: AppBar(
@@ -86,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   TextField(
                     style: GoogleFonts.rubik(fontSize: 18,),
-                    controller: nombreCtrl,
+                    controller: userCtrl,
                     decoration: const InputDecoration(
                       border: UnderlineInputBorder(),
                       labelText: 'Usuario',
@@ -114,9 +129,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             return const Vreguser();
                           }));
                         },
-                        child: const Text('Registrarse'),
+                        child: Container(padding: EdgeInsets.symmetric(vertical:20),child: const Text('Registrarse')),
                         style: ElevatedButton.styleFrom(
-                            shape: StadiumBorder(),
+                          shape: StadiumBorder(),
                             foregroundColor: Colors.white,
                             textStyle: GoogleFonts.rubik(
                               fontSize: 18,
@@ -126,12 +141,45 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.push(context,
+                          print(box.toMap());
+                          box.toMap().forEach((key, value) {
+                            if(value['user']==userCtrl.text){
+                              error = false;
+                            }
+                          });
+                          if(error==true){
+                              showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: Row(
+                              children: [
+                                Icon(
+                                  Icons.warning,
+                                  color: Colors.red
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text('Error'),
+                              ]),
+                            content:
+                                const Text('El usuario o contraseña estan incorrectos'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
+                        );
+                          }
+                          else if(error==false){Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
                             return const Vlistreport();
-                          }));
+                          }));}
+                          
                         },
-                        child: const Text('Iniciar Sesión'),
+                        child: Container(padding: EdgeInsets.symmetric(vertical: 20),child: const Text('Iniciar Sesión')),
                         style: ElevatedButton.styleFrom(
                             shape: StadiumBorder(),
                             foregroundColor: Colors.white,
@@ -142,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             backgroundColor: Colors.cyan),
                       ),
                     ],
-                  ),
+                  ),/*
                   TextButton(
                     style: TextButton.styleFrom(
                       textStyle: TextStyle(
@@ -153,7 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     onPressed: () {},
                     child: const Text('¿Olvidaste tu contraseña?'),
-                  ),
+                  ),*/
                 ],
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class Vreguser extends StatefulWidget {
   const Vreguser({super.key,});
@@ -8,6 +9,8 @@ class Vreguser extends StatefulWidget {
   @override
   State<Vreguser> createState() => _VreguserState();
 }
+
+var box = Hive.box('usuarios');
 
 class _VreguserState extends State<Vreguser> {
   final TextEditingController nombreCtrl = TextEditingController();
@@ -110,11 +113,41 @@ class _VreguserState extends State<Vreguser> {
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
-                            backgroundColor: Color(0xFFD3A518)),
+                            backgroundColor: Color(0xFFD3A518)
+                            ),
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Map<String,dynamic> m = {
+                                'user':nombreCtrl.text,
+                                'correo':correoCtrl.text,
+                                'contra':contraCtrl.text,
+                              };
+                              box.add(m);
+                              showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: Row(
+                              children: [
+                                Icon(
+                                  Icons.check_circle,
+                                  color: Colors.green
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text('Confirmacion'),
+                              ]),
+                            content:
+                                const Text('¡Usuario Registrado!'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
+                        ).then((value) => Navigator.pop(context));
                         },
                         child: const Text('Registrarse'),
                         style: ElevatedButton.styleFrom(

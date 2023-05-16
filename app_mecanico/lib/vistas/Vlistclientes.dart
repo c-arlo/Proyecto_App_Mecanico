@@ -1,32 +1,30 @@
+import 'package:app_mecanico/vistas/Vaddcliente.dart';
 import 'package:app_mecanico/vistas/Vlistcitas.dart';
-import 'package:app_mecanico/vistas/Vlistclientes.dart';
+import 'package:app_mecanico/vistas/Vlistreport.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:app_mecanico/reporte/reg_cliente.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
+import 'package:app_mecanico/modelo/cliente.dart';
 
-class Vlistreport extends StatefulWidget {
-  const Vlistreport({
+class Vlistclientes extends StatefulWidget {
+  const Vlistclientes({
     super.key,
   });
 
   @override
-  State<Vlistreport> createState() => _VlistreportState();
+  State<Vlistclientes> createState() => _VlistclientesState();
 }
 
-var box = Hive.box('Citas');
-List<String> fecha = [];
-
-class _VlistreportState extends State<Vlistreport> {
+class _VlistclientesState extends State<Vlistclientes> {
+  var box = Hive.box('Clientes');
   void _estado(){
     setState((){});
   }
 
   @override
   Widget build(BuildContext context) {
-    return 
-    Scaffold(
+    return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       backgroundColor: Color(0xFF1C488D),
       appBar: AppBar(
@@ -56,7 +54,9 @@ class _VlistreportState extends State<Vlistreport> {
                   SizedBox(
                     height: 20,
                   ),
-                  Text('¡Bienvenido!',style: GoogleFonts.rubik(fontSize: 20),
+                  Text(
+                    '¡Bienvenido!',
+                    style: GoogleFonts.rubik(fontSize: 20),
                   )
                 ],
               ),
@@ -67,7 +67,12 @@ class _VlistreportState extends State<Vlistreport> {
                 child: Column(
                   children: [
                     ElevatedButton(
-                      onPressed: null,
+                      onPressed: (){
+                        Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return const Vlistreport();
+                          }));
+                      },
                       style: ElevatedButton.styleFrom(
                         disabledForegroundColor: Colors.grey,
                         backgroundColor: Color(0xFF1C488D),
@@ -83,7 +88,9 @@ class _VlistreportState extends State<Vlistreport> {
                               Icons.list_alt,
                               size: 40,
                             ),
-                            Text(' Reportes',style: GoogleFonts.rubik(fontSize: 22),
+                            Text(
+                              ' Reportes',
+                              style: GoogleFonts.rubik(fontSize: 22),
                             ),
                           ],
                         ),
@@ -121,14 +128,10 @@ class _VlistreportState extends State<Vlistreport> {
                     ),
                     
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return const Vlistclientes();
-                          }));
-                      },
+                      onPressed: null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF1C488D),
+                        disabledForegroundColor: Colors.grey,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(0.0)),
                       ),
@@ -181,31 +184,58 @@ class _VlistreportState extends State<Vlistreport> {
         ),
       ),
       body: Container(
-            padding: EdgeInsets.all(15),
+            padding: EdgeInsets.only(left: 15,right: 15, top: 40, bottom: 60),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 10,),
-                Text('Listado de Reportes',style: GoogleFonts.rubik(fontSize: 25,color: Colors.white),),
-                SizedBox(height: 10,),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                    ],
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.group, size: 40, color: Colors.white,),
+                    SizedBox(width: 10,),
+                    Text('Listado de Clientes',style: GoogleFonts.rubik(fontSize: 25,color: Colors.white),),
+                  ],
                 ),
-                SizedBox(height: 10,),
+                SizedBox(height: 20,),
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: ListView(
+                      children: box.values.toList().map((e) => Container(
+                        padding: EdgeInsets.all(20),
+                          child:
+                            ExpansionTile(
+                              leading: Icon(Icons.person),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              title: Text(e['nombre']+ " " + e['appat']+ " " + e['apmat'], 
+                              style: GoogleFonts.rubik(fontSize: 18),),
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.phone),
+                                    SizedBox(width: 20,),
+                                    Text(e['tel'],style: GoogleFonts.rubik(fontSize: 18),textAlign: TextAlign.left),
+                                  ],
+                                ),
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Icon(Icons.home),
+                                    SizedBox(width: 20,),
+                                    Text(e['calle'],style: GoogleFonts.rubik(fontSize: 18),textAlign: TextAlign.left,),
+                                  ],
+                                ),
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Icon(Icons.location_on),
+                                    Text(e['estado'],style: GoogleFonts.rubik(fontSize: 18),textAlign: TextAlign.center,),
+                                  ],
+                                ),
+                              ],),
+                      )).toList(),
                     ),
                   ),
                 ),
@@ -215,7 +245,7 @@ class _VlistreportState extends State<Vlistreport> {
       floatingActionButton: FloatingActionButton.large(
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const registrarcl();
+            return const Vaddcliente();
           })).then((value) => _estado());
         },
         child: Icon(Icons.add),
